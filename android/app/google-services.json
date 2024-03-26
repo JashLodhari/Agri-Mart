@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "427405783097",
+    "project_id": "agri-mart-app-46881",
+    "storage_bucket": "agri-mart-app-46881.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427405783097:android:8aed9924d19d94bc111de8",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1dHAdcER1GH1AXHpv2M2TrcWQxNBLmHQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
