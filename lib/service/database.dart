@@ -35,6 +35,10 @@ class DatabaseMethods {
     return await FirebaseFirestore.instance.collection("users").doc(id).collection("Cart").snapshots();
   }
 
+  Future<Stream<QuerySnapshot>> retriveVeges() async {
+    return await FirebaseFirestore.instance.collection("Vegetables").snapshots();
+  }
+
   // UpdateUserwallet(String id, String amount) async {
   //   return await FirebaseFirestore.instance
   //       .collection("users")
