@@ -1,5 +1,7 @@
 import 'package:app/admin/add_vegetables.dart';
+import 'package:app/admin/delete_vegetables.dart';
 import 'package:app/admin/retrive_vegetables.dart';
+import 'package:app/admin/update_vegetables.dart';
 import 'package:app/widget/widget_support.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +88,7 @@ class _HomeAdminState extends State<HomeAdmin> {
             Container(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddVeges()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => UpdateVeges()));
                 },
                 child: Material(
                   elevation: 10.0,
@@ -116,7 +118,7 @@ class _HomeAdminState extends State<HomeAdmin> {
             Container(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddVeges()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => DeleteVeges()));
                 },
                 child: Material(
                   elevation: 10.0,

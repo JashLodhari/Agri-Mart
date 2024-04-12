@@ -153,7 +153,7 @@ class _DetailsState extends State<Details> {
                         style: AppWidget.boldTextFieldStyle(),
                       ),
                       Text(
-                        "\u{20B9}" + total.toString(),
+                        "\u{20B9}" + total.toString() + "/kg",
                         style: AppWidget.HeadlineTextFieldStyle(),
                       )
                     ],

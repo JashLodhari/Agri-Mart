@@ -2,8 +2,12 @@ import 'dart:io';
 import 'package:app/admin/admin_login.dart';
 import 'package:app/admin/home_admin.dart';
 import 'package:app/pages/bottom_navigation.dart';
+import 'package:app/pages/check_authentication.dart';
 import 'package:app/pages/home.dart';
+import 'package:app/pages/login.dart';
 import 'package:app/pages/onboard.dart';
+import 'package:app/pages/order.dart';
+import 'package:app/pages/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +34,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeAdmin(),
+      home: CheckAuthentication(),
     );
   }
 }

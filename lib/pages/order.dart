@@ -6,6 +6,7 @@ import 'package:app/widget/widget_support.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class Order extends StatefulWidget {
   const Order({super.key});
@@ -131,7 +132,7 @@ class _OrderState extends State<Order> {
                     )))),
             SizedBox(height: 20.0),
             Container(
-              height: MediaQuery.of(context).size.height/2,
+              height: MediaQuery.of(context).size.height/1.7,
                 child: vegesCart()),
             Spacer(),
             Divider(),

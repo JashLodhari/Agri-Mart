@@ -1,11 +1,13 @@
 import 'package:app/pages/details.dart';
-import 'package:app/pages/order.dart';
+import 'package:app/pages/order.dart' show Order;
 import 'package:app/service/database.dart';
+import 'package:app/service/shared_pref.dart';
 import 'package:app/widget/widget_support.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:badges/badges.dart' as badges;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,8 +17,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   Stream? vegesitemStream;
+  String? name;
+
+  getthesharedpref() async {
+    name = await SharedPreferenceHelper().getUserName();
+    setState(() {});
+  }
+
+  onthisload() async {
+    await getthesharedpref();
+    setState(() {});
+  }
 
   ontheload() async {
     vegesitemStream = await DatabaseMethods().getVeges("Vegetables");
@@ -25,6 +37,7 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    onthisload();
     ontheload();
     super.initState();
   }
@@ -35,71 +48,88 @@ class _HomeState extends State<Home> {
       builder: (context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                padding: EdgeInsets.all(5.0),
-                itemCount: snapshot.data.docs.length,
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Details(detail: ds["Detail"], name: ds["Name"], price: ds["Price"], image: ds["Image"],)));
-                    },
+            padding: EdgeInsets.all(5.0),
+            itemCount: snapshot.data.docs.length,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = snapshot.data.docs[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              Details(
+                                detail: ds["Detail"],
+                                name: ds["Name"],
+                                price: ds["Price"],
+                                image: ds["Image"],
+                              )));
+                },
+                child: Container(
+                  margin: EdgeInsets.only(right: 20.0, bottom: 20.0),
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(20),
                     child: Container(
-                      margin: EdgeInsets.only(right: 20.0, bottom: 20.0),
-                      child: Material(
-                        elevation: 5.0,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: EdgeInsets.all(5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(ds["Image"],
+                                height: 120, width: 120, fit: BoxFit.cover),
+                          ),
+                          SizedBox(width: 20.0),
+                          Column(
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(ds["Image"],
-                                    height: 120, width: 120, fit: BoxFit.cover),
+                              Container(
+                                width:
+                                MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width / 3,
+                                child: Text(
+                                  ds["Name"],
+                                  style: AppWidget.boldTextFieldStyle(),
+                                ),
                               ),
-                              SizedBox(width: 20.0),
-                              Column(
-                                children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 3,
-                                    child: Text(
-                                      ds["Name"],
-                                      style: AppWidget.boldTextFieldStyle(),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 3,
-                                    child: Text(
-                                      "Fresh",
-                                      style: AppWidget.LightTextFieldStyle(),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 3,
-                                    child: Text(
-                                      "\u{20B9}"+ds["Price"],
-                                      style: AppWidget.boldTextFieldStyle(),
-                                    ),
-                                  )
-                                ],
+                              SizedBox(height: 5.0),
+                              Container(
+                                width:
+                                MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width / 3,
+                                child: Text(
+                                  "Fresh",
+                                  style: AppWidget.LightTextFieldStyle(),
+                                ),
                               ),
+                              SizedBox(height: 5.0),
+                              Container(
+                                width:
+                                MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width / 3,
+                                child: Text(
+                                  "\u{20B9}" + ds["Price"] + "/Kg",
+                                  style: AppWidget.boldTextFieldStyle(),
+                                ),
+                              )
                             ],
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                  );
-                })
+                  ),
+                ),
+              );
+            })
             : CircularProgressIndicator();
       },
     );
@@ -108,7 +138,9 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: name == null
+          ? CircularProgressIndicator()
+          : SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.only(top: 50.0, left: 20.0),
           child: Column(
@@ -117,16 +149,21 @@ class _HomeState extends State<Home> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Hello Jash,", style: AppWidget.boldTextFieldStyle()),
+                  Text("Hello, ${name!}", style: AppWidget.boldTextFieldStyle()),
                   Container(
                     margin: EdgeInsets.only(right: 20.0),
                     padding: EdgeInsets.all(3),
                     decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(8)),
-                    child: Icon(
-                      Icons.shopping_cart,
-                      color: Colors.white,
+                    child: GestureDetector(
+                      onTap: (){
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => Order()));
+                      },
+                      child: Icon(
+                        Icons.shopping_cart,
+                        color: Colors.white,
+                      ),
                     ),
                   )
                 ],
@@ -139,8 +176,7 @@ class _HomeState extends State<Home> {
               SizedBox(height: 30.0),
               Column(
                 children: [
-                  Container(
-                      child: allItemsVertically()),
+                  Container(child: allItemsVertically()),
                 ],
               ),
             ],

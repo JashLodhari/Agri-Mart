@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:app/pages/login.dart';
+import 'package:app/pages/signup.dart';
 import 'package:app/service/auth.dart';
 import 'package:app/service/shared_pref.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -270,6 +272,10 @@ class _ProfileState extends State<Profile> {
                   GestureDetector(
                     onTap: () {
                       AuthMethods().deleteUser();
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>SignUp()));
+                      ScaffoldMessenger.of(context).showSnackBar((SnackBar(
+                        backgroundColor: Colors.redAccent,
+                        content: Text("User Account Deleted Successfully", style: TextStyle(fontSize: 20.0),),)));
                     },
                     child: Container(
                       margin: EdgeInsets.symmetric(horizontal: 20.0),
@@ -312,6 +318,10 @@ class _ProfileState extends State<Profile> {
                   GestureDetector(
                     onTap: () {
                       AuthMethods().SignOut();
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>LogIn()));
+                      ScaffoldMessenger.of(context).showSnackBar((SnackBar(
+                        backgroundColor: Colors.redAccent,
+                        content: Text("User LogOut Deleted Successfully", style: TextStyle(fontSize: 20.0),),)));
                     },
                     child: Container(
                       margin: EdgeInsets.symmetric(horizontal: 20.0),

@@ -36,7 +36,7 @@ class _RetriveVegesState extends State<RetriveVeges> {
                     DocumentSnapshot ds = snapshot.data.docs[index];
                     return Container(
                       padding: EdgeInsets.only(left: 10.0),
-                      margin: EdgeInsets.only(right: 20.0, bottom: 20.0),
+                      margin: EdgeInsets.only(right: 10.0, bottom: 20.0),
                       child: Material(
                         elevation: 5.0,
                         borderRadius: BorderRadius.circular(20),
@@ -75,7 +75,7 @@ class _RetriveVegesState extends State<RetriveVeges> {
                                     width:
                                         MediaQuery.of(context).size.width / 3,
                                     child: Text(
-                                      "\u{20B9}" + ds["Price"],
+                                      "\u{20B9}" + ds["Price"] + "/kg",
                                       style: AppWidget.boldTextFieldStyle(),
                                     ),
                                   )

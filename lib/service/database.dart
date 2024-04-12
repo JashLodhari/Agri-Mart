@@ -39,6 +39,14 @@ class DatabaseMethods {
     return await FirebaseFirestore.instance.collection("Vegetables").snapshots();
   }
 
+  Future updateVeges(String id, Map<String, dynamic> updateInfo) async {
+    return await FirebaseFirestore.instance.collection("Vegetables").doc(id).update(updateInfo);
+  }
+
+  Future deleteVeges(String id) async {
+    return await FirebaseFirestore.instance.collection("Vegetables").doc(id).delete();
+  }
+
   // UpdateUserwallet(String id, String amount) async {
   //   return await FirebaseFirestore.instance
   //       .collection("users")
