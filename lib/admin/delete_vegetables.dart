@@ -218,8 +218,7 @@ class _DeleteVegesState extends State<DeleteVeges> {
                               "Price": pricecontroller.text
                             };
                             await DatabaseMethods()
-                                .updateVeges(id, updateInfo)
-                                .then((value) {
+                                .deleteVeges(id).then((value) {
                               Navigator.pop(context);
                             });
                           },

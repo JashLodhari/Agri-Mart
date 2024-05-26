@@ -321,7 +321,7 @@ class _ProfileState extends State<Profile> {
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>LogIn()));
                       ScaffoldMessenger.of(context).showSnackBar((SnackBar(
                         backgroundColor: Colors.redAccent,
-                        content: Text("User LogOut Deleted Successfully", style: TextStyle(fontSize: 20.0),),)));
+                        content: Text("User LogOut Successfully", style: TextStyle(fontSize: 20.0),),)));
                     },
                     child: Container(
                       margin: EdgeInsets.symmetric(horizontal: 20.0),

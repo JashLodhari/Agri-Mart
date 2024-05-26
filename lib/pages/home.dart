@@ -1,5 +1,5 @@
 import 'package:app/pages/details.dart';
-import 'package:app/pages/order.dart' show Order;
+import 'package:app/pages/order.dart';
 import 'package:app/service/database.dart';
 import 'package:app/service/shared_pref.dart';
 import 'package:app/widget/widget_support.dart';
@@ -150,22 +150,6 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Hello, ${name!}", style: AppWidget.boldTextFieldStyle()),
-                  Container(
-                    margin: EdgeInsets.only(right: 20.0),
-                    padding: EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: GestureDetector(
-                      onTap: (){
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) => Order()));
-                      },
-                      child: Icon(
-                        Icons.shopping_cart,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
                 ],
               ),
               SizedBox(height: 20.0),

@@ -1,3 +1,4 @@
+import 'package:app/pages/bottom_navigation.dart';
 import 'package:app/pages/home.dart';
 import 'package:app/pages/onboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +13,7 @@ class CheckAuthentication extends StatelessWidget {
       body: StreamBuilder<User?>(stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot){
             if(snapshot.hasData){
-              return const Home();
+              return const BottomNav();
             }else{
               return const Onboard();
             }
