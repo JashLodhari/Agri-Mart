@@ -32,25 +32,41 @@ class DatabaseMethods {
   }
 
   Future<Stream<QuerySnapshot>> getVegesCart(String id) async {
-    return await FirebaseFirestore.instance.collection("users").doc(id).collection("Cart").snapshots();
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .collection("Cart")
+        .snapshots();
   }
 
   Future<Stream<QuerySnapshot>> retriveVeges() async {
-    return await FirebaseFirestore.instance.collection("Vegetables").snapshots();
+    return await FirebaseFirestore.instance
+        .collection("Vegetables")
+        .snapshots();
   }
 
-  Future updateVeges(String id, Map<String, dynamic> updateInfo) async {
-    return await FirebaseFirestore.instance.collection("Vegetables").doc(id).update(updateInfo);
+  Future<void> updateVeges(String docId, Map<String, dynamic> updateInfo) async {
+    try {
+      await FirebaseFirestore.instance.collection('Vegetables').doc(docId).update(updateInfo);
+    } catch (e) {
+      print(e);
+    }
   }
 
-  Future deleteVeges(String id) async {
-    return await FirebaseFirestore.instance.collection("Vegetables").doc(id).delete();
+  Future<void> deleteVeges(String docId) async {
+    try {
+      await FirebaseFirestore.instance.collection('Vegetables').doc(docId).delete();
+    } catch (e) {
+      print(e);
+    }
   }
 
-  // UpdateUserwallet(String id, String amount) async {
-  //   return await FirebaseFirestore.instance
-  //       .collection("users")
-  //       .doc(id)
-  //       .update({"Wallet": amount});
-  // }
+  Future<void> removeItemFromCart(String userId, String docId) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('Cart')
+        .doc(docId)
+        .delete();
+  }
 }

@@ -38,6 +38,7 @@ class _UpdateVegesState extends State<UpdateVeges> {
                   itemCount: snapshot.data.docs.length,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
+                    String docId = ds.id; // Use document ID directly
                     return Container(
                       padding: EdgeInsets.only(left: 10.0),
                       margin: EdgeInsets.only(right: 10.0, bottom: 20.0),
@@ -72,7 +73,7 @@ class _UpdateVegesState extends State<UpdateVeges> {
                                           onTap: () {
                                             namecontroller.text = ds["Name"];
                                             pricecontroller.text = ds["Price"];
-                                            EditVegesDetails(ds["Name"]);
+                                            EditVegesDetails(docId);
                                           },
                                           child: Flexible(
                                               child: Icon(
@@ -142,7 +143,7 @@ class _UpdateVegesState extends State<UpdateVeges> {
     );
   }
 
-  Future EditVegesDetails(String id) => showDialog(
+  Future EditVegesDetails(String docId) => showDialog(
       context: context,
       builder: (context) => (AlertDialog(
             content: Container(
@@ -216,10 +217,9 @@ class _UpdateVegesState extends State<UpdateVeges> {
                   Center(child: ElevatedButton(onPressed: () async {
                     Map<String, dynamic>updateInfo={
                       "Name": namecontroller.text,
-                      "Id": id,
                       "Price": pricecontroller.text
                     };
-                    await DatabaseMethods().updateVeges(id, updateInfo).then((value) {
+                    await DatabaseMethods().updateVeges(docId, updateInfo).then((value) {
                       Navigator.pop(context);
                     });
                   }, child: Text("Update")))

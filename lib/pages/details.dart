@@ -7,11 +7,12 @@ import 'package:flutter/material.dart';
 class Details extends StatefulWidget {
   String image, name, detail, price;
 
-  Details(
-      {required this.detail,
-      required this.image,
-      required this.name,
-      required this.price});
+  Details({
+    required this.detail,
+    required this.image,
+    required this.name,
+    required this.price,
+  });
 
   @override
   State<Details> createState() => _DetailsState();
@@ -20,6 +21,7 @@ class Details extends StatefulWidget {
 class _DetailsState extends State<Details> {
   int a = 1, total = 0;
   String? id;
+  bool isLoading = false; // Add a boolean state variable
 
   getthesharedpref() async {
     id = await SharedPreferenceHelper().getUserId();
@@ -47,13 +49,14 @@ class _DetailsState extends State<Details> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_new_outlined,
-                  color: Colors.black,
-                )),
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back_ios_new_outlined,
+                color: Colors.black,
+              ),
+            ),
             Image.network(
               widget.image,
               width: MediaQuery.of(context).size.width,
@@ -83,8 +86,9 @@ class _DetailsState extends State<Details> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8)),
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     child: Icon(
                       Icons.remove,
                       color: Colors.white,
@@ -105,14 +109,15 @@ class _DetailsState extends State<Details> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8)),
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     child: Icon(
                       Icons.add,
                       color: Colors.white,
                     ),
                   ),
-                )
+                ),
               ],
             ),
             SizedBox(height: 20.0),
@@ -137,7 +142,7 @@ class _DetailsState extends State<Details> {
                 Text(
                   "30 min",
                   style: AppWidget.boldTextFieldStyle(),
-                )
+                ),
               ],
             ),
             Spacer(),
@@ -155,11 +160,15 @@ class _DetailsState extends State<Details> {
                       Text(
                         "\u{20B9}" + total.toString() + "/kg",
                         style: AppWidget.HeadlineTextFieldStyle(),
-                      )
+                      ),
                     ],
                   ),
                   GestureDetector(
                     onTap: () async {
+                      setState(() {
+                        isLoading = true; // Show loading indicator
+                      });
+
                       Map<String, dynamic> addVegestoCart = {
                         "Name": widget.name,
                         "Quantity": a.toString(),
@@ -168,48 +177,96 @@ class _DetailsState extends State<Details> {
                       };
                       await DatabaseMethods()
                           .addVegesToCart(addVegestoCart, id ?? "null");
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: Colors.orangeAccent,
-                          content: Text(
-                            "Vegetable Added to Cart",
-                            style: TextStyle(fontSize: 18.0),
-                          )));
+
+                      setState(() {
+                        isLoading = false; // Hide loading indicator
+                      });
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            title: Row(
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.green),
+                                SizedBox(width: 10),
+                                Text("Success"),
+                              ],
+                            ),
+                            content: Text(
+                              "Vegetable added to cart successfully!",
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text(
+                                  "OK",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 2,
                       padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Add to cart",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16.0,
-                                fontFamily: 'Poppins'),
-                          ),
-                          SizedBox(width: 30.0),
-                          Container(
-                            padding: EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Icon(
-                              Icons.shopping_cart_outlined,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(width: 10.0),
-                        ],
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      child: isLoading
+                          ? Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "Add to cart",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16.0,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                SizedBox(width: 30.0),
+                                Container(
+                                  padding: EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    Icons.shopping_cart_outlined,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(width: 10.0),
+                              ],
+                            ),
                     ),
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
