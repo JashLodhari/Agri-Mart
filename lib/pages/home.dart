@@ -46,8 +46,7 @@ class _HomeState extends State<Home> {
       period: Duration(seconds: 2), // Duration of the shimmer effect
       child: ListView.builder(
         padding: EdgeInsets.all(5.0),
-        itemCount: 5,
-        // Number of shimmer items
+        itemCount: 5, // Number of shimmer items
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         scrollDirection: Axis.vertical,
@@ -106,81 +105,107 @@ class _HomeState extends State<Home> {
     return StreamBuilder(
       stream: vegesitemStream,
       builder: (context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                padding: EdgeInsets.all(5.0),
-                itemCount: snapshot.data.docs.length,
-                shrinkWrap: true,
-                physics: AlwaysScrollableScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Details(
-                                    detail: ds["Detail"],
-                                    name: ds["Name"],
-                                    price: ds["Price"],
-                                    image: ds["Image"],
-                                  )));
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 20.0),
-                      child: Material(
-                        elevation: 5.0,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(ds["Image"],
-                                    height: 120, width: 120, fit: BoxFit.cover),
-                              ),
-                              SizedBox(width: 20.0),
-                              Column(
-                                children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 3,
-                                    child: Text(
-                                      ds["Name"],
-                                      style: AppWidget.boldTextFieldStyle(),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 3,
-                                    child: Text(
-                                      "Fresh",
-                                      style: AppWidget.LightTextFieldStyle(),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 3,
-                                    child: Text(
-                                      "\u{20B9}" + ds["Price"] + "/Kg",
-                                      style: AppWidget.boldTextFieldStyle(),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+        if (!snapshot.hasData) {
+          return shimmerEffect();
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.data.docs.isEmpty) {
+          return Center(child: Text('No vegetables found'));
+        } else {
+          return ListView.builder(
+            padding: EdgeInsets.all(5.0),
+            itemCount: snapshot.data.docs.length,
+            shrinkWrap: true,
+            physics: AlwaysScrollableScrollPhysics(),
+            scrollDirection: Axis.vertical,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = snapshot.data.docs[index];
+              var data = ds.data() as Map<String, dynamic>?;
+              bool isAvailable = data != null && data.containsKey('isAvailable') ? data['isAvailable'] : true;
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Details(
+                        detail: ds["Detail"],
+                        name: ds["Name"],
+                        price: ds["Price"],
+                        image: ds["Image"],
+                        isAvailable: isAvailable, // Pass isAvailable to Details widget
                       ),
                     ),
                   );
-                })
-            : shimmerEffect(); // Use shimmer effect while loading
+                },
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 20.0),
+                  child: Material(
+                    elevation: 5.0,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(
+                              ds["Image"],
+                              height: 120,
+                              width: 120,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(width: 20.0),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: Text(
+                                  ds["Name"],
+                                  style: AppWidget.boldTextFieldStyle(),
+                                ),
+                              ),
+                              SizedBox(height: 5.0),
+                              Container(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: Text(
+                                  "Fresh",
+                                  style: AppWidget.LightTextFieldStyle(),
+                                ),
+                              ),
+                              SizedBox(height: 5.0),
+                              Container(
+                                width: MediaQuery.of(context).size.width / 3,
+                                child: Text(
+                                  "\u{20B9}${ds["Price"]}/Kg",
+                                  style: AppWidget.boldTextFieldStyle(),
+                                ),
+                              ),
+                              SizedBox(height: 5.0),
+                              if (!isAvailable)
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 3,
+                                  child: Text(
+                                    "Out of Stock",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }
       },
     );
   }
@@ -190,41 +215,41 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: name == null
           ? Center(
-              child: shimmerEffect(), // Show shimmer effect while loading name
-            )
+        child: shimmerEffect(), // Show shimmer effect while loading name
+      )
           : Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  margin: EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Hey! ${name!}",
-                        style: AppWidget.boldTextFieldStyle(),
-                      ),
-                      SizedBox(height: 20.0),
-                      Text(
-                        "Fresh Vegetables",
-                        style: AppWidget.HeadlineTextFieldStyle(),
-                      ),
-                      Text(
-                        "Discover and Get Great Veges",
-                        style: AppWidget.LightTextFieldStyle(),
-                      ),
-                    ],
-                  ),
+                Text(
+                  "Hey! ${name!}",
+                  style: AppWidget.boldTextFieldStyle(),
                 ),
-                SizedBox(height: 30.0),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: allItemsVertically(),
-                  ),
+                SizedBox(height: 20.0),
+                Text(
+                  "Fresh Vegetables",
+                  style: AppWidget.HeadlineTextFieldStyle(),
+                ),
+                Text(
+                  "Discover and Get Great Veges",
+                  style: AppWidget.LightTextFieldStyle(),
                 ),
               ],
             ),
+          ),
+          SizedBox(height: 30.0),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: allItemsVertically(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

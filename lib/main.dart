@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:app/admin/admin_login.dart';
 import 'package:app/admin/home_admin.dart';
 import 'package:app/pages/bottom_navigation.dart';
 import 'package:app/pages/check_authentication.dart';

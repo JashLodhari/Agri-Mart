@@ -29,86 +29,148 @@ class _DeleteVegesState extends State<DeleteVeges> {
 
   Widget allVegesDetails() {
     return StreamBuilder(
-        stream: VegesStream,
-        builder: (context, AsyncSnapshot snapshot) {
-          return snapshot.hasData
-              ? ListView.builder(
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    DocumentSnapshot ds = snapshot.data.docs[index];
-                    String docId = ds.id; // Accessing the document ID directly
-                    return Container(
-                      padding: EdgeInsets.only(left: 10.0),
-                      margin: EdgeInsets.only(right: 10.0, bottom: 20.0),
-                      child: Material(
-                        elevation: 5.0,
-                        borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.network(ds["Image"],
-                                    height: 100, width: 100, fit: BoxFit.cover),
-                              ),
-                              SizedBox(width: 20.0),
-                              Column(
+      stream: VegesStream,
+      builder: (context, AsyncSnapshot snapshot) {
+        return snapshot.hasData
+            ? ListView.builder(
+            itemCount: snapshot.data.docs.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = snapshot.data.docs[index];
+              String docId = ds.id; // Accessing the document ID directly
+              return Container(
+                padding: EdgeInsets.only(left: 10.0),
+                margin: EdgeInsets.only(right: 10.0, bottom: 20.0),
+                child: Material(
+                  elevation: 5.0,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(ds["Image"],
+                              height: 100, width: 100, fit: BoxFit.cover),
+                        ),
+                        SizedBox(width: 20.0),
+                        Column(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.3,
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2.3,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          ds["Name"],
-                                          style: AppWidget.boldTextFieldStyle(),
+                                  Text(
+                                    ds["Name"],
+                                    style: AppWidget.boldTextFieldStyle(),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      // Show confirmation dialog
+                                      bool confirmDelete = await showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: Text("Confirm Deletion"),
+                                          content: Text(
+                                              "Are you sure you want to delete this item?"),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(false);
+                                              },
+                                              child: Text("Cancel"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true);
+                                              },
+                                              child: Text("Delete"),
+                                            ),
+                                          ],
                                         ),
-                                        GestureDetector(
-                                          onTap: () async {
-                                            await DatabaseMethods()
-                                                .deleteVeges(docId);
-                                          },
-                                          child: Flexible(
-                                              child: Icon(
-                                            Icons.delete,
-                                            color: Colors.orange,
-                                          )),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2.3,
-                                    child: Text(
-                                      "Fresh",
-                                      style: AppWidget.LightTextFieldStyle(),
-                                    ),
-                                  ),
-                                  SizedBox(height: 5.0),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2.3,
-                                    child: Text(
-                                      "\u{20B9}" + ds["Price"] + "/kg",
-                                      style: AppWidget.boldTextFieldStyle(),
+                                      );
+
+                                      if (confirmDelete) {
+                                        // If user confirms, delete the item
+                                        await DatabaseMethods()
+                                            .deleteVeges(docId)
+                                            .then((value) {
+                                          // Show success dialog
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              title: Row(
+                                                children: [
+                                                  Icon(Icons.check_circle, color: Colors.green),
+                                                  SizedBox(width: 10),
+                                                  Text("Success"),
+                                                ],
+                                              ),
+                                              content: Text(
+                                                "Vegetable has been deleted successfully!",
+                                                style: TextStyle(fontSize: 18.0),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  child: Text(
+                                                    "OK",
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                      }
+                                    },
+                                    child: Flexible(
+                                      child: Icon(
+                                        Icons.delete,
+                                        color: Colors.orange,
+                                      ),
                                     ),
                                   )
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 5.0),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.3,
+                              child: Text(
+                                "Fresh",
+                                style: AppWidget.LightTextFieldStyle(),
+                              ),
+                            ),
+                            SizedBox(height: 5.0),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.3,
+                              child: Text(
+                                "\u{20B9}" + ds["Price"] + "/kg",
+                                style: AppWidget.boldTextFieldStyle(),
+                              ),
+                            )
+                          ],
                         ),
-                      ),
-                    );
-                  })
-              : CircularProgressIndicator();
-        });
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            })
+            : CircularProgressIndicator();
+      },
+    );
   }
 
   @override
@@ -130,7 +192,7 @@ class _DeleteVegesState extends State<DeleteVeges> {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(left: 20.0, right: 20.0),
+        margin: EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0),
         child: Column(
           children: [
             Expanded(child: allVegesDetails()),
@@ -139,91 +201,4 @@ class _DeleteVegesState extends State<DeleteVeges> {
       ),
     );
   }
-
-  // Future EditVegesDetails(String docID) => showDialog(
-  //     context: context,
-  //     builder: (context) => (AlertDialog(
-  //           content: Container(
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Row(
-  //                   children: [
-  //                     GestureDetector(
-  //                       onTap: () {
-  //                         Navigator.pop(context);
-  //                       },
-  //                       child: Icon(Icons.cancel),
-  //                     ),
-  //                     SizedBox(width: 60.0),
-  //                     Text(
-  //                       "Edit",
-  //                       style: TextStyle(
-  //                           color: Colors.blue,
-  //                           fontSize: 24.0,
-  //                           fontWeight: FontWeight.bold),
-  //                     ),
-  //                     Text(
-  //                       "Details",
-  //                       style: TextStyle(
-  //                           color: Colors.blue,
-  //                           fontSize: 24.0,
-  //                           fontWeight: FontWeight.bold),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 SizedBox(height: 20.0),
-  //                 Text(
-  //                   "Name",
-  //                   style: TextStyle(
-  //                       color: Colors.black,
-  //                       fontSize: 20.0,
-  //                       fontWeight: FontWeight.bold),
-  //                 ),
-  //                 SizedBox(height: 10.0),
-  //                 Container(
-  //                   padding: EdgeInsets.only(left: 10.0),
-  //                   decoration: BoxDecoration(
-  //                       border: Border.all(),
-  //                       borderRadius: BorderRadius.circular(10)),
-  //                   child: TextField(
-  //                     controller: namecontroller,
-  //                     decoration: InputDecoration(border: InputBorder.none),
-  //                   ),
-  //                 ),
-  //                 SizedBox(height: 20.0),
-  //                 Text(
-  //                   "Price",
-  //                   style: TextStyle(
-  //                       color: Colors.black,
-  //                       fontSize: 20.0,
-  //                       fontWeight: FontWeight.bold),
-  //                 ),
-  //                 SizedBox(height: 10.0),
-  //                 Container(
-  //                   padding: EdgeInsets.only(left: 10.0),
-  //                   decoration: BoxDecoration(
-  //                       border: Border.all(),
-  //                       borderRadius: BorderRadius.circular(10)),
-  //                   child: TextField(
-  //                     controller: pricecontroller,
-  //                     decoration: InputDecoration(border: InputBorder.none),
-  //                   ),
-  //                 ),
-  //                 SizedBox(height: 30.0),
-  //                 Center(
-  //                     child: ElevatedButton(
-  //                         onPressed: () async {
-  //                           Map<String, dynamic> updateInfo = {
-  //                             "Name": namecontroller.text,
-  //                             "Id": docID,
-  //                             "Price": pricecontroller.text
-  //                           };
-  //                           await DatabaseMethods().deleteVeges(docID);
-  //                         },
-  //                         child: Text("Update")))
-  //               ],
-  //             ),
-  //           ),
-  //         )));
 }

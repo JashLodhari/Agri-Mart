@@ -48,7 +48,7 @@ class _RetriveVegesState extends State<RetriveVeges> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
                                 child: Image.network(ds["Image"],
-                                    height: 120, width: 120, fit: BoxFit.cover),
+                                    height: 100, width: 100, fit: BoxFit.cover),
                               ),
                               SizedBox(width: 20.0),
                               Column(
@@ -110,7 +110,7 @@ class _RetriveVegesState extends State<RetriveVeges> {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(left: 20.0, right: 20.0),
+        margin: EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0),
         child: Column(
           children: [
             Expanded(child: allVegesDetails()),

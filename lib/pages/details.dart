@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 
 class Details extends StatefulWidget {
   String image, name, detail, price;
+  bool isAvailable;
 
   Details({
     required this.detail,
     required this.image,
     required this.name,
     required this.price,
+    required this.isAvailable, // Add this line
   });
 
   @override
@@ -165,103 +167,141 @@ class _DetailsState extends State<Details> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      setState(() {
-                        isLoading = true; // Show loading indicator
-                      });
+                      if (widget.isAvailable) {
+                        setState(() {
+                          isLoading = true; // Show loading indicator
+                        });
 
-                      Map<String, dynamic> addVegestoCart = {
-                        "Name": widget.name,
-                        "Quantity": a.toString(),
-                        "Total": total.toString(),
-                        "Image": widget.image,
-                      };
-                      await DatabaseMethods()
-                          .addVegesToCart(addVegestoCart, id ?? "null");
+                        Map<String, dynamic> addVegestoCart = {
+                          "Name": widget.name,
+                          "Quantity": a.toString(),
+                          "Total": total.toString(),
+                          "Image": widget.image,
+                        };
+                        await DatabaseMethods()
+                            .addVegesToCart(addVegestoCart, id ?? "null");
 
-                      setState(() {
-                        isLoading = false; // Hide loading indicator
-                      });
+                        setState(() {
+                          isLoading = false; // Hide loading indicator
+                        });
 
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            title: Row(
-                              children: [
-                                Icon(Icons.check_circle, color: Colors.green),
-                                SizedBox(width: 10),
-                                Text("Success"),
-                              ],
-                            ),
-                            content: Text(
-                              "Vegetable added to cart successfully!",
-                              style: TextStyle(fontSize: 18.0),
-                            ),
-                            actions: [
-                              TextButton(
-                                child: Text(
-                                  "OK",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                            ],
-                          );
-                        },
-                      );
+                              title: Row(
+                                children: [
+                                  Icon(Icons.check_circle, color: Colors.green),
+                                  SizedBox(width: 10),
+                                  Text("Success"),
+                                ],
+                              ),
+                              content: Text(
+                                "Vegetable added to cart successfully!",
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: Text(
+                                    "OK",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              title: Row(
+                                children: [
+                                  Icon(Icons.error, color: Colors.red),
+                                  SizedBox(width: 10),
+                                  Text("Out of Stock"),
+                                ],
+                              ),
+                              content: Text(
+                                "This item is currently out of stock.",
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: Text(
+                                    "OK",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     },
                     child: Container(
                       width: MediaQuery.of(context).size.width / 2,
                       padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
-                        color: Colors.black,
+                        color: widget.isAvailable ? Colors.black : Colors.grey,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: isLoading
                           ? Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            )
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      )
                           : Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "Add to cart",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.0,
-                                    fontFamily: 'Poppins',
-                                  ),
-                                ),
-                                SizedBox(width: 30.0),
-                                Container(
-                                  padding: EdgeInsets.all(3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Icon(
-                                    Icons.shopping_cart_outlined,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(width: 10.0),
-                              ],
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            widget.isAvailable ? "Add to cart" : "Out of stock",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                              fontFamily: 'Poppins',
                             ),
+                          ),
+                          SizedBox(width: 30.0),
+                          Container(
+                            padding: EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.shopping_cart_outlined,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 10.0),
+                        ],
+                      ),
                     ),
                   ),
                 ],

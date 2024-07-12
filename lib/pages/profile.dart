@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:app/pages/login.dart';
 import 'package:app/pages/signup.dart';
 import 'package:app/service/auth.dart';
+import 'package:app/service/database.dart';
 import 'package:app/service/shared_pref.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 
@@ -71,7 +73,7 @@ class _ProfileState extends State<Profile> {
       loggingOut = true; // Set loading indicator to true
     });
     try {
-      await AuthMethods().SignOut();
+      await AuthMethods().deleteUserDocumentAndAccount();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LogIn()),
@@ -102,6 +104,63 @@ class _ProfileState extends State<Profile> {
       });
     }
   }
+
+  Future<void> deleteAccount() async {
+    setState(() {
+      loggingOut = true; // Set loading indicator to true
+    });
+    try {
+      await AuthMethods().deleteUserDocumentAndAccount();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SignUp()),
+      );
+    } catch (e) {
+      print("Error during logout: $e");
+    } finally {
+      setState(() {
+        loggingOut = false; // Reset loading indicator
+      });
+    }
+  }
+
+  Future<void> deleteUserAccount() async {
+    setState(() {
+      loggingOut = true; // Set loading indicator to true
+    });
+    try {
+      await AuthMethods().deleteUserDocumentAndAccount();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SignUp()),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(
+            "User Account Deleted Successfully",
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
+      );
+    } catch (e) {
+      print("Error during logout: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(
+            "Failed to logout: $e",
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
+      );
+    } finally {
+      setState(() {
+        loggingOut = false; // Reset loading indicator
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -311,38 +370,44 @@ class _ProfileState extends State<Profile> {
               ),
             ),
             SizedBox(height: 30.0),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Material(
-                borderRadius: BorderRadius.circular(10),
-                elevation: 2.0,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                      vertical: 15.0, horizontal: 10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete,
-                        color: Colors.black,
-                      ),
-                      SizedBox(width: 20.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Delete Account",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      )
-                    ],
+            GestureDetector(
+              onTap: () async {
+                await deleteUserAccount();
+                await deleteAccount();
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Material(
+                  borderRadius: BorderRadius.circular(10),
+                  elevation: 2.0,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        vertical: 15.0, horizontal: 10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.delete,
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: 20.0),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Delete Account",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -1,7 +1,9 @@
+import 'package:app/admin/home_admin.dart';
 import 'package:app/pages/bottom_navigation.dart';
 import 'package:app/pages/forgot_password.dart';
 import 'package:app/pages/signup.dart';
 import 'package:app/widget/widget_support.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,9 +16,7 @@ class LogIn extends StatefulWidget {
 
 class _LogInState extends State<LogIn> {
   String email = "", password = "";
-
   bool loading = false;
-
   final _formkey = GlobalKey<FormState>();
 
   TextEditingController useremailcontroller = TextEditingController();
@@ -27,16 +27,23 @@ class _LogInState extends State<LogIn> {
       setState(() {
         loading = true;
       });
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNav()));
+
+      // Check if the user is an admin
+      bool isAdmin = await checkAdminCredentials(email, password);
+      if (isAdmin) {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeAdmin()));
+      } else {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNav()));
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("No User Found for that Email", style: TextStyle(fontSize: 18.0, color: Colors.black),),
+          content: Text("No User Found for that Email", style: TextStyle(fontSize: 18.0, color: Colors.black)),
         ));
       } else if (e.code == 'wrong-password') {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Wrong Password Provided by User", style: TextStyle(fontSize: 18.0, color: Colors.black),),
+          content: Text("Wrong Password Provided by User", style: TextStyle(fontSize: 18.0, color: Colors.black)),
         ));
       }
     } finally {
@@ -44,6 +51,17 @@ class _LogInState extends State<LogIn> {
         loading = false;
       });
     }
+  }
+
+  Future<bool> checkAdminCredentials(String email, String password) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("Admin").get();
+    for (var result in snapshot.docs) {
+      var data = result.data() as Map<String, dynamic>?;
+      if (data != null && data['id'] == email && data['password'] == password) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
@@ -121,7 +139,7 @@ class _LogInState extends State<LogIn> {
                                       return null;
                                     },
                                     decoration: InputDecoration(
-                                      hintText: 'Email',
+                                      hintText: 'Id / Email',
                                       hintStyle: AppWidget.semiBoldTextFieldStyle(),
                                       prefixIcon: Icon(Icons.email_outlined),
                                     ),
