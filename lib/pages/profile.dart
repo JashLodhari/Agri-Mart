@@ -5,7 +5,9 @@ import 'package:app/pages/signup.dart';
 import 'package:app/service/auth.dart';
 import 'package:app/service/database.dart';
 import 'package:app/service/shared_pref.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -73,7 +75,7 @@ class _ProfileState extends State<Profile> {
       loggingOut = true; // Set loading indicator to true
     });
     try {
-      await AuthMethods().deleteUserDocumentAndAccount();
+      await AuthMethods().signOut();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LogIn()),
@@ -105,51 +107,48 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> deleteAccount() async {
-    setState(() {
-      loggingOut = true; // Set loading indicator to true
-    });
-    try {
-      await AuthMethods().deleteUserDocumentAndAccount();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SignUp()),
-      );
-    } catch (e) {
-      print("Error during logout: $e");
-    } finally {
-      setState(() {
-        loggingOut = false; // Reset loading indicator
-      });
-    }
-  }
-
   Future<void> deleteUserAccount() async {
     setState(() {
       loggingOut = true; // Set loading indicator to true
     });
     try {
-      await AuthMethods().deleteUserDocumentAndAccount();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SignUp()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.redAccent,
-          content: Text(
-            "User Account Deleted Successfully",
-            style: TextStyle(fontSize: 20.0),
+      // Get the current user
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        String uid = user.uid;
+
+        // Delete the user's document from Firestore
+        await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+
+        // Delete the user's authentication
+        await user.delete();
+
+        // Clear shared preferences
+        // await SharedPreferenceHelper().clear();
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SignUp()),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              "User Account Deleted Successfully",
+              style: TextStyle(fontSize: 20.0),
+            ),
           ),
-        ),
-      );
+        );
+      }
     } catch (e) {
       print("Error during logout: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent,
           content: Text(
-            "Failed to logout: $e",
+            "Failed to delete account: $e",
             style: TextStyle(fontSize: 20.0),
           ),
         ),
@@ -160,7 +159,6 @@ class _ProfileState extends State<Profile> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -373,7 +371,6 @@ class _ProfileState extends State<Profile> {
             GestureDetector(
               onTap: () async {
                 await deleteUserAccount();
-                await deleteAccount();
               },
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 20.0),

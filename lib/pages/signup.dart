@@ -3,8 +3,8 @@ import 'package:app/pages/login.dart';
 import 'package:app/service/database.dart';
 import 'package:app/service/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:random_string/random_string.dart';
 
 import '../widget/widget_support.dart';
 
@@ -23,42 +23,40 @@ class _SignUpState extends State<SignUp> {
   TextEditingController namecontroller = TextEditingController();
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController passwordcontroller = TextEditingController();
-  TextEditingController depLoccontroller = TextEditingController();
-  TextEditingController buildingNamecontroller = TextEditingController();
   TextEditingController mobileNocontroller = TextEditingController();
 
   final _formkey = GlobalKey<FormState>();
 
   registration() async {
-    if (password != null) {
+    if (password.isNotEmpty) {
       try {
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: password);
-        ScaffoldMessenger.of(context).showSnackBar((SnackBar(
+        String id = userCredential.user!.uid;
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.redAccent,
           content: Text(
-            "Registration Successfully",
+            "Registration Successful",
             style: TextStyle(fontSize: 20.0),
           ),
-        )));
-        String Id = randomAlphaNumeric(10);
+        ));
+
         Map<String, dynamic> addUserInfo = {
-          "Id": Id,
+          "Id": id,
           "Name": namecontroller.text,
           "Email": emailcontroller.text,
-          "Department Location": depLoccontroller.text,
-          "Building Name": buildingNamecontroller.text,
           "Mobile Number": mobileNocontroller.text,
+          "profileImage":'',
           "Wallet": "0",
         };
-        await DatabaseMethods().addUserDetail(addUserInfo, Id);
+
+        await DatabaseMethods().addUserDetail(addUserInfo, id);
         await SharedPreferenceHelper().saveUserName(namecontroller.text);
         await SharedPreferenceHelper().saveUserEmail(emailcontroller.text);
-        await SharedPreferenceHelper().saveUserDepLoc(depLoccontroller.text);
-        await SharedPreferenceHelper().saveUserBuildingName(buildingNamecontroller.text);
         await SharedPreferenceHelper().saveUserMobile(mobileNocontroller.text);
         await SharedPreferenceHelper().saveUserWallet('0');
-        await SharedPreferenceHelper().saveUserId(Id);
+        await SharedPreferenceHelper().saveUserId(id);
 
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => BottomNav()));
@@ -74,7 +72,7 @@ class _SignUpState extends State<SignUp> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               backgroundColor: Colors.orangeAccent,
               content: Text(
-                "Account already exits",
+                "Account already exists",
                 style: TextStyle(fontSize: 18.0),
               )));
         }
@@ -128,7 +126,7 @@ class _SignUpState extends State<SignUp> {
                           child: Container(
                             padding: EdgeInsets.only(left: 20.0, right: 20.0),
                             width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height / 1,
+                            height: MediaQuery.of(context).size.height / 1.3,
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(20)),
@@ -186,34 +184,6 @@ class _SignUpState extends State<SignUp> {
                                   ),
                                   SizedBox(height: 30.0),
                                   TextFormField(
-                                    controller: depLoccontroller,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please Enter Department_Location';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: InputDecoration(
-                                        hintText: 'Department Location',
-                                        hintStyle: AppWidget.semiBoldTextFieldStyle(),
-                                        prefixIcon: Icon(Icons.location_city_outlined)),
-                                  ),
-                                  SizedBox(height: 30.0),
-                                  TextFormField(
-                                    controller: buildingNamecontroller,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please Enter Building Name';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: InputDecoration(
-                                        hintText: 'Building Name',
-                                        hintStyle: AppWidget.semiBoldTextFieldStyle(),
-                                        prefixIcon: Icon(Icons.location_city_sharp)),
-                                  ),
-                                  SizedBox(height: 30.0),
-                                  TextFormField(
                                     controller: mobileNocontroller,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -238,8 +208,6 @@ class _SignUpState extends State<SignUp> {
                                           name = namecontroller.text;
                                           email = emailcontroller.text;
                                           password = passwordcontroller.text;
-                                          depLoc = depLoccontroller.text;
-                                          buildingName = buildingNamecontroller.text;
                                           mobileNo = mobileNocontroller.text;
                                         });
                                         await registration();
@@ -252,7 +220,7 @@ class _SignUpState extends State<SignUp> {
                                       elevation: 5.0,
                                       borderRadius: BorderRadius.circular(20),
                                       child: Container(
-                                        padding: EdgeInsets.symmetric(vertical: 15.0),
+                                        padding: EdgeInsets.symmetric(vertical: 8.0),
                                         width: 200,
                                         decoration: BoxDecoration(
                                             color: Color(0Xffff5722),

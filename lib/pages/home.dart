@@ -132,6 +132,7 @@ class _HomeState extends State<Home> {
                         name: ds["Name"],
                         price: ds["Price"],
                         image: ds["Image"],
+                        quantity: ds["Quantity"],
                         isAvailable: isAvailable, // Pass isAvailable to Details widget
                       ),
                     ),
@@ -179,7 +180,7 @@ class _HomeState extends State<Home> {
                               Container(
                                 width: MediaQuery.of(context).size.width / 3,
                                 child: Text(
-                                  "\u{20B9}${ds["Price"]}/Kg",
+                                  "\u{20B9}${ds["Price"]}/${ds["Quantity"]}",
                                   style: AppWidget.boldTextFieldStyle(),
                                 ),
                               ),

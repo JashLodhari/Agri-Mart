@@ -75,7 +75,7 @@ class _RetriveVegesState extends State<RetriveVeges> {
                                     width:
                                         MediaQuery.of(context).size.width / 3,
                                     child: Text(
-                                      "\u{20B9}" + ds["Price"] + "/kg",
+                                      "\u{20B9}${ds["Price"]}/${ds["Quantity"]}",
                                       style: AppWidget.boldTextFieldStyle(),
                                     ),
                                   )

@@ -92,7 +92,7 @@ class _ManageStockState extends State<ManageStock> {
                                 SizedBox(height: 5.0),
                                 Container(
                                   child: Text(
-                                    "\u{20B9}${ds["Price"]}/kg",
+                                    "\u{20B9}${ds["Price"]}/${ds["Quantity"]}",
                                     style: AppWidget.boldTextFieldStyle(),
                                     overflow: TextOverflow.ellipsis,
                                   ),

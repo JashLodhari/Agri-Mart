@@ -100,7 +100,7 @@ class _UpdateVegesState extends State<UpdateVeges> {
                               width:
                               MediaQuery.of(context).size.width / 2.3,
                               child: Text(
-                                "\u{20B9}" + ds["Price"] + "/kg",
+                                "\u{20B9}${ds["Price"]}/${ds["Quantity"]}",
                                 style: AppWidget.boldTextFieldStyle(),
                               ),
                             )

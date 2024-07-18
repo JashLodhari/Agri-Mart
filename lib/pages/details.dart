@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Details extends StatefulWidget {
-  String image, name, detail, price;
+  String image, name, detail, price, quantity;
   bool isAvailable;
 
   Details({
@@ -14,6 +14,7 @@ class Details extends StatefulWidget {
     required this.name,
     required this.price,
     required this.isAvailable, // Add this line
+    required this.quantity,
   });
 
   @override
@@ -160,7 +161,7 @@ class _DetailsState extends State<Details> {
                         style: AppWidget.boldTextFieldStyle(),
                       ),
                       Text(
-                        "\u{20B9}" + total.toString() + "/kg",
+                        "\u{20B9}${total.toString()}/${widget.quantity}",
                         style: AppWidget.HeadlineTextFieldStyle(),
                       ),
                     ],

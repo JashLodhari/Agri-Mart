@@ -21,6 +21,7 @@ class _AddVegesState extends State<AddVeges> {
   TextEditingController namecontroller = TextEditingController();
   TextEditingController pricecontroller = TextEditingController();
   TextEditingController detailcontroller = TextEditingController();
+  bool? isAvailable;
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
   bool uploading = false;
@@ -62,7 +63,7 @@ class _AddVegesState extends State<AddVeges> {
           "Detail": detailcontroller.text,
           "Category": categoryValue,
           "Quantity": quantityValue,
-          "isAvailable": '',
+          "isAvailable": true,
         };
 
         await DatabaseMethods().addVeges(addItem, categoryValue!);
@@ -271,7 +272,7 @@ class _AddVegesState extends State<AddVeges> {
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        items: ['kg', 'piece', 'bunch']
+                        items: ['Kg', 'Piece', 'Bunch', 'Gram']
                             .map(
                               (item) => DropdownMenuItem<String>(
                                 value: item,
